@@ -1,81 +1,100 @@
-# thermodynamic_modeling_of_NP_endocytosis
-This repository contains the Python implementation of a thermodynamic model to evaluate how nanoparticle (NP) size influences membrane wrapping during endocytosis, as described in our research.
+# thermodynamic\_modeling\_of\_NP\_endocytosis
+
+This repository contains the Python implementation of a thermodynamic model to evaluate how nanoparticle \(NP\) size influences membrane wrapping during endocytosis, as described in our research\.
 
 ## Overview
-The model is built upon a free-energy framework incorporating:
-- Mixing entropy of NP mixtures
-- Ligand-receptor binding energy
-- Membrane bending energy
-- NP configurational entropy (simplified to retain only size-dependent energetic and entropic terms)
 
-The free-energy functional used in the simulation is:  
-$$W = M_f[\xi_f \ln(\xi_f) + (1-\xi_f)\ln(1-\xi_f)] - \mu L_b + 8\pi\kappa\eta N$$  
+This work adopts a  energetic model developed by Agudo Canalejo and Lipowsky (ACS Nano 2015) to characterize the nanoparticle endocytosis rate dependent on particle diameter, for both clathrin\-independent \(CIE\) and clathrin\-mediated \(CME\) endocytosis pathways\. The model focuses on size\-related membrane wrapping effects, and directly computes normalized endocytosis rate using a unified physical formula\.
 
-Where all energies are expressed in units of $k_BT$:
-- $M_f$: Free membrane area (in units of receptor area $A_0$), $M_f = M - M_b$ (total membrane $M = 4\pi R^2/A_0$)
-- $\xi_f$: Density of free receptors, $\xi_f = (\xi_0M - L_b)/M_f$
-- $\mu$: Chemical energy gain from ligand-receptor binding
-- $L_b = \eta NK$: Number of ligand-receptor bonds (scaled linearly with wrapped area)
-- $\kappa$: Membrane bending rigidity (varied for clathrin-independent (CIE, $\kappa=10k_BT$) and clathrin-mediated (CME, $\kappa=60k_BT$) endocytosis)
-- $\eta \in [0,1]$: Wrapping area fraction of NPs
-- $N$: Number of NPs with wrapping fraction $\eta$ (contributes $8\pi\kappa\eta$ to total bending energy)
-- $K = 4\pi R^2/A_0$: NP surface area in units of receptor area $A_0$
-- $\xi_0$: Initial receptor density on the unbound membrane
+The core formula for endocytosis rate is defined as:
+$y = \frac{X^2 - (1 + a \cdot X)^2}{X^3}$
+Where negative values are set to 0 to conform to physical constraints, and the final results are normalized to a maximum value of 1\.
 
-For each NP size, the free energy $W$ is numerically minimized over $N$ (number of NPs) and $\eta$ (wrapping fraction). The resulting wrapping amount $\eta N$ is used as a proxy for endocytosis capacity.
+### Variable Definition
+
+- $D$: Nanoparticle diameter \(nm\), ranging from 1 to 200 nm
+
+- $R_w$: Characteristic adhesion length scale = 48\.6 nm
+
+- $D_w = 2R_w$
+
+- $X = D / D_w$
+
+- $a = R_w \cdot m_{bo}$
+
+- $m_{bo}$: Membrane local spontaneous curature \(different for CIE and CME\)
+
 
 ## Requirements
-- Python 3.12+ (consistent with the research implementation)
-- numpy >= 1.21.0
-- matplotlib >= 3.4.0
-- pandas >= 1.3.0
+
+Python 3\.12\+
+numpy \>= 1\.21\.0
+matplotlib \>= 3\.4\.0
 
 Install dependencies via pip:
+
 ```bash
-pip install numpy matplotlib pandas
+pip install numpy matplotlib
+```
 
 ## How to Run
-1. Clone this repository:
+
+1. Clone this repository
+
 ```bash
 git clone https://github.com/[Your-Username]/[Repo-Name].git
 cd [Repo-Name]
 ```
-2. Execute the main simulation script:
+
+2. Run the main script
+
 ```bash
-python np_endocytosis_simulation.py
+python englufment_rate.py
 ```
-3. The script will:
-Run numerical minimization of free energy for NP sizes from 10 nm to 100 nm diameter
-Generate separate plots for CIE and CME pathways (y-axis tick labels hidden as per visualization requirements)
-Print optimal NP diameter (max endocytosis capacity) for both pathways in the terminal
+
+The script will:
+
+- Calculate endocytosis rate over NP diameter from 1 nm to 200 nm with high\-resolution sampling
+
+- Generate independent figures for CIE and CME pathways
+
+- Mark the optimal diameter with maximum endocytosis rate on plots
+
+- Print peak diameter values for two pathways in the terminal
 
 ## Key Parameters
-| Parameter       | Description                                  | Unit          | CIE Value | CME Value |
-|-----------------|----------------------------------------------|---------------|-----------|-----------|
-| $\kappa$ (kappa)| Membrane bending rigidity                    | $k_BT$        | 10        | 60        |
-| $\mu$ (mu)      | Ligand-receptor binding energy gain          | $k_BT$        | 20        | 20        |
-| $\xi_0$ (xi0)   | Initial receptor density on unbound membrane | Dimensionless | 0.05      | 0.05      |
-| $A_0$ (A0)      | Area per receptor                            | $m^2$         | $(15e-9)^2$ | $(15e-9)^2$ |
-| $M$             | Total membrane lattice points                | Dimensionless | $3.14e6$  | $3.14e6$  |
-| $c$             | NP surface concentration                     | $1/A_0$       | 0.003     | 0.003     |
 
-## Implementation Details
+| Parameter      | Description                          | Unit | CIE Value | CME Value |
+| -------------- | ------------------------------------ | ---- | --------- | --------- |
+| $R_w$          | Characteristic adhesion length       | nm   | 48\.6     | 48\.6     |
+| $m_{bo}$       | Local spontaneous curature           | \-   | \-0\.1    | \-0\.025  |
+| Diameter range | Simulated NP diameter range          | nm   | 1 \~ 200  | 1 \~ 200  |
 
-- A grid-search approach is used to numerically minimize the free energy over N (number of NPs) and η (wrapping fraction)
-- Physical constraints are enforced (e.g., non-negative free membrane area, valid receptor density range)
-- Separate simulations for CIE and CME pathways (differentiated by bending rigidity κ)
-- Output plots show NP diameter (x-axis) vs. endocytosis capacity (ηN, y-axis) with optimal diameter marked
+
 
 ## Output
 
-1. Interactive Plots:
+### Figures
 
-  - Two separate figures for CIE and CME endocytosis
-  - X-axis: NP diameter (nm)
-  - Y-axis: Wrapped/endocytosed amount (ηN)
-  - Vertical dashed line: Optimal NP diameter for maximum endocytosis capacity
+Two standalone figures \(8 × 5 inches\):
 
+- X\-axis: NP Diameter \(nm\), range: 0 \~ 200 nm
 
-2. Terminal Summary:
+- Y\-axis: Normalized Endocytosis rate, range: 0 \~ 1\.05 \(y\-axis ticks hidden\)
 
-  - Optimal diameter and maximum wrapped amount for CIE/CME pathways
+- Dashed vertical line: Optimal diameter with maximum endocytosis rate
+
+- Text label: Exact value of peak diameter
+
+- Gray dashed horizontal line: Baseline at y = 0
+
+### Terminal Output
+
+Print the optimal diameter for CIE and CME respectively:
+
+```Plain Text
+CIE 峰值直径 = XX.X nm
+CME 峰值直径 = XX.X nm
+```
+
+> （注：文档部分内容可能由 AI 生成）
