@@ -67,7 +67,7 @@ The script will:
 | Parameter      | Description                          | Unit | CIE Value | CME Value |
 | -------------- | ------------------------------------ | ---- | --------- | --------- |
 | $R_w$          | Characteristic adhesion length       | nm   | 48\.6     | 48\.6     |
-| $m_{bo}$       | Local spontaneous curature           | \-   | \-0\.1    | \-0\.025  |
+| $m_{bo}$       | Local spontaneous curature           | nm-1   | \-0\.1    | \-0\.025  |
 | Diameter range | Simulated NP diameter range          | nm   | 1 \~ 200  | 1 \~ 200  |
 
 
